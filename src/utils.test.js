@@ -1,4 +1,4 @@
-const { parseWayPts, processInput } = require('./utils.js')
+const { parseWayPts, processInput, makeRetryFunc } = require('./utils.js')
 
 const userInput = `
     37.86893429,-122.2678041
@@ -15,7 +15,6 @@ const routeData = [
 ]
 
 test('parseWayPts', () => {
-
     const expectedWayPts = {
         origin: { lat: 37.86893429, lng: -122.2678041 },
         wayPts: [
@@ -35,26 +34,102 @@ test('parseWayPts', () => {
 
 describe('processInput', () => {
     it('should return an obj with a success prop', () => {
-        expect(processInput('dummy')).toEqual(expect.objectContaining({
-            success: expect.any(Boolean)
-        }))
+        expect(processInput('dummy')).toEqual(
+            expect.objectContaining({
+                success: expect.any(Boolean)
+            })
+        )
     })
 
     it('should return success false with bad input', () => {
-        expect(processInput('dummy')).toEqual(expect.objectContaining({
-            success: false
-        }))
+        expect(processInput('dummy')).toEqual(
+            expect.objectContaining({
+                success: false
+            })
+        )
     })
 
     it('should return success with good input', () => {
-        expect(processInput(userInput)).toEqual(expect.objectContaining({
-            success: true
-        }))
+        expect(processInput(userInput)).toEqual(
+            expect.objectContaining({
+                success: true
+            })
+        )
     })
 
     it('should return data with good input', () => {
-        expect(processInput(userInput)).toEqual(expect.objectContaining({
-            data: routeData
-        }))
+        expect(processInput(userInput)).toEqual(
+            expect.objectContaining({
+                data: routeData
+            })
+        )
+    })
+})
+
+describe('makeRetryFunc', () => {
+    let promiseFunc, makeRetryFuncOpts, ranNum
+
+    beforeEach(() => {
+        promiseFunc = jest.fn(() => {
+            return new Promise(r => setTimeout(() => r('done'), 500))
+        })
+
+        makeRetryFuncOpts = {
+            func: promiseFunc,
+            max: 3,
+            interval: 100,
+            shouldRetry: () => true
+        }
+
+        ranNum = Math.floor(Math.random()*9) + 1 // 1 - 10
+    })
+
+    it('return a function', () => {
+        expect(makeRetryFunc(makeRetryFuncOpts)).toEqual(expect.any(Function))
+    })
+
+    it('reject promise after "max" number of retries', async () => {
+        expect.assertions(2)
+        const refunc = makeRetryFunc(makeRetryFuncOpts)
+        try {
+            await refunc()
+        } catch (e) {
+            expect(e).toEqual(new Error('exceeded retries'))
+        }
+
+        expect(makeRetryFuncOpts.func).toHaveBeenCalledTimes(3)
+    })
+
+    describe('shouldRetry', () => {
+        it('should be called with resolved result', async () => {
+            const shouldRetry = jest.fn(() => false)
+            const refunc = makeRetryFunc(
+                Object.assign({}, makeRetryFuncOpts, {
+                    shouldRetry
+                })
+            )
+
+            await refunc()
+
+            expect(shouldRetry).toBeCalledWith('done')
+        })
+
+        it('control when to stop', async () => {
+            let count = 0
+            const shouldRetry = jest.fn(() => {
+                count++
+                return count < ranNum
+            })
+            const refunc = makeRetryFunc(
+                Object.assign({}, makeRetryFuncOpts, {
+                    shouldRetry,
+                    max: 11
+                })
+            )
+
+            await refunc()
+
+            expect(makeRetryFuncOpts.func).toHaveBeenCalledTimes(ranNum)
+        })
     })
 })

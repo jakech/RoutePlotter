@@ -1,16 +1,21 @@
 import axios from 'axios'
+import { makeRetryFunc } from './utils.js'
 
 export const generateRoute = data => {
     // data is an array of arrays
-    console.log(data)
-    return axios({
-        method: 'post',
-        url: '/route',
+    return axios.post('/route', {
         headers: { 'Content-Type': 'application/json' },
         data: JSON.stringify(data)
     })
 }
 
 export const fetchRoute = token => {
-    return axios.get(`/route/${token}`).then(r => r.data)
+    const get = makeRetryFunc({
+        func: axios.get.bind(axios),
+        shouldRetry: ({ data }) => data.status === 'in progress'
+    })
+    return get(`/route/${token}`).then(({ data }) => {
+        if (data.status === 'failure') throw new Error(data.error)
+        return data
+    })
 }
