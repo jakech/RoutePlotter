@@ -1,13 +1,13 @@
-import { generateRoute } from '../api.js'
-import { processInput } from '../utils.js'
+import * as gmap from './gmap'
+import { generateRoute, fetchRoute } from '../api.js'
+import { processInput, parseWayPts } from '../utils.js'
 
 const BTN_TEXT_LOADING = 'Generating route...'
 const BTN_TEXT_DEFAULT = 'Plot route'
 
-let tokenCallback, $form, $input, $btn
+let $form, $input, $btn
 
-export const init = (map, onReceiveToken) => {
-    tokenCallback = onReceiveToken
+export const init = (map) => {
     $form = document.getElementById('form')
     $input = $form.querySelector('textarea')
     $btn = $form.querySelector('button')
@@ -21,21 +21,30 @@ async function handleFormSubmit(e) {
     const value = $input.value.trim()
     if (value) {
         const { success, data } = processInput(value)
-        console.log(data)
         if (success) {
             $btn.setAttribute('disabled', true)
             $btn.innerHTML = BTN_TEXT_LOADING
             try {
                 const res = await generateRoute(data)
-                tokenCallback(res.data.token)
-                $btn.innerHTML = BTN_TEXT_DEFAULT
+                handleToken(res.data.token)
             } catch (error) {
                 console.log('api error', error)
-            } finally {
-                $btn.removeAttribute('disabled')
             }
         } else {
             console.log('input error')
         }
+    }
+}
+
+async function handleToken(token) {
+    try {
+        const { path } = await fetchRoute(token)
+        console.log(gmap)
+        gmap.drawRouteOnMap(parseWayPts(path))
+    } catch (error) {
+        console.log('server failed', error)
+    } finally {
+        $btn.innerHTML = BTN_TEXT_DEFAULT
+        $btn.removeAttribute('disabled')
     }
 }
