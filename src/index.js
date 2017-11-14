@@ -1,6 +1,7 @@
 import loadGmap from './loadGoogleMapsAPI.js'
 import 'normalize.css'
 import './style.css'
+import 'noty/lib/noty.css'
 
 import * as form from './modules/form.js'
 import * as gmap from './modules/gmap.js'

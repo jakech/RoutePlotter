@@ -20,7 +20,6 @@ export function drawRouteOnMap({ origin, dest, wayPts }) {
 }
 
 export function displayOnMap(response, status) {
-    console.log(response)
     if (status === 'OK') {
         directionsDisplay.setDirections(response)
     }

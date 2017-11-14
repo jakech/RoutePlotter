@@ -1,3 +1,4 @@
+import Noty from 'noty'
 import * as gmap from './gmap'
 import { generateRoute, fetchRoute } from '../api.js'
 import { processInput, parseWayPts } from '../utils.js'
@@ -5,9 +6,10 @@ import { processInput, parseWayPts } from '../utils.js'
 const BTN_TEXT_LOADING = 'Generating route...'
 const BTN_TEXT_DEFAULT = 'Plot route'
 
-let $form, $input, $btn
+let $form, $input, $btn, $noty
 
-export const init = (map) => {
+export const init = map => {
+    $noty = new Noty({ type: 'error', timeout: 1000 })
     $form = document.getElementById('form')
     $input = $form.querySelector('textarea')
     $btn = $form.querySelector('button')
@@ -28,10 +30,10 @@ async function handleFormSubmit(e) {
                 const res = await generateRoute(data)
                 handleToken(res.data.token)
             } catch (error) {
-                console.log('api error', error)
+                $noty.setText(error, true).show()
             }
         } else {
-            console.log('input error')
+            $noty.setText('input error', true).show()
         }
     }
 }
@@ -39,10 +41,9 @@ async function handleFormSubmit(e) {
 async function handleToken(token) {
     try {
         const { path } = await fetchRoute(token)
-        console.log(gmap)
         gmap.drawRouteOnMap(parseWayPts(path))
     } catch (error) {
-        console.log('server failed', error)
+        $noty.setText(error, true).show()
     } finally {
         $btn.innerHTML = BTN_TEXT_DEFAULT
         $btn.removeAttribute('disabled')
