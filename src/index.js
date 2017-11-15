@@ -16,5 +16,3 @@ loadGmap().then(() => {
     form.init(map)
 })
 
-
-

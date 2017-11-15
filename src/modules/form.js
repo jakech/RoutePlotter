@@ -1,7 +1,6 @@
 import Noty from 'noty'
-import * as gmap from './gmap'
-import { generateRoute, fetchRoute } from '../api.js'
-import { processInput, parseWayPts } from '../utils.js'
+import { generateRoute } from '../api.js'
+import { processInput } from '../utils.js'
 
 const BTN_TEXT_LOADING = 'Generating route...'
 const BTN_TEXT_DEFAULT = 'Plot route'
@@ -28,24 +27,19 @@ async function handleFormSubmit(e) {
             $btn.innerHTML = BTN_TEXT_LOADING
             try {
                 const res = await generateRoute(data)
-                handleToken(res.data.token)
+                if (res.data.token) {
+                    window.location.hash = res.data.token
+                } else {
+                    throw new Error('no token')
+                }
             } catch (error) {
                 $noty.setText(error, true).show()
+            } finally {
+                $btn.innerHTML = BTN_TEXT_DEFAULT
+                $btn.removeAttribute('disabled')
             }
         } else {
             $noty.setText('input error', true).show()
         }
-    }
-}
-
-async function handleToken(token) {
-    try {
-        const { path } = await fetchRoute(token)
-        gmap.drawRouteOnMap(parseWayPts(path))
-    } catch (error) {
-        $noty.setText(error, true).show()
-    } finally {
-        $btn.innerHTML = BTN_TEXT_DEFAULT
-        $btn.removeAttribute('disabled')
     }
 }
