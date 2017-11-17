@@ -35,7 +35,34 @@ html, body {
 }
 
 /*helpers*/
+
+/* Nicolas Gallagher micro clearfix */
+.cf:before,
+.cf:after {
+    content: " ";
+    display: table;
+}
+
+.cf:after {
+    clear: both;
+}
+
 .db {
     display: block;
     width: 100%;
+}
+
+dt {
+    float: left;
+    clear: left;
+    font-weight: bold;
+}
+
+dt:after {
+    content: ":";
+}
+
+dd {
+    float: left;
+    margin: 0 0 0 4em;
 }

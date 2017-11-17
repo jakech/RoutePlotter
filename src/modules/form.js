@@ -43,3 +43,10 @@ async function handleFormSubmit(e) {
         }
     }
 }
+
+export function addToRoute(coords) {
+    if ($input.value !== '' && $input.value.slice(-1) !== '\n') {
+        $input.value += '\n'
+    }
+    $input.value += `${coords.lat},${coords.lng}\n`
+}
