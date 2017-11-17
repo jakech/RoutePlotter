@@ -2,6 +2,8 @@ import Noty from 'noty'
 import { generateRoute } from '../api.js'
 import { processInput } from '../utils.js'
 
+import formTemplate from '../templates/form.js'
+
 const BTN_TEXT_LOADING = 'Generating route...'
 const BTN_TEXT_DEFAULT = 'Plot route'
 
@@ -9,7 +11,8 @@ let $form, $input, $btn, $noty
 
 export const init = map => {
     $noty = new Noty({ type: 'error', timeout: 1000 })
-    $form = document.getElementById('form')
+    $form = document.createElement('div')
+    $form.innerHTML = formTemplate()
     $input = $form.querySelector('textarea')
     $btn = $form.querySelector('button')
     map.controls[google.maps.ControlPosition.TOP_LEFT].push($form)

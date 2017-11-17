@@ -3,6 +3,8 @@ import { addToRoute } from './form.js'
 import { fetchRoute } from '../api.js'
 import { parseWayPts } from '../utils.js'
 
+import infoTemplate from '../templates/infoWindow.js'
+
 var directionsService, directionsDisplay, $noty
 
 export function init(map) {
@@ -10,24 +12,27 @@ export function init(map) {
     directionsDisplay = new google.maps.DirectionsRenderer()
     directionsDisplay.setMap(map)
 
-    const marker = new google.maps.Marker({ map })
+    const marker = new google.maps.Marker()
     const infowindow = new google.maps.InfoWindow()
 
-    map.addListener('click', handleClick)
+    infowindow.addListener('closeclick', () => {
+        // remove the marker when inforwindow close
+        marker.setMap(null)
+    })
 
     window.addEventListener('click', event => {
         if (event.target.classList.contains('js-addToRoute')) {
+            event.preventDefault()
             const coords = marker.getPosition()
             addToRoute({ lat: coords.lat(), lng: coords.lng() })
+            marker.setMap(null)
         }
     })
 
-    function handleClick(e) {
+    map.addListener('click', e => {
         const { latLng } = e
-        marker.setPosition(latLng)
-        infowindow.setContent(infoTemplate(latLng))
-        infowindow.open(map, marker)
-    }
+        displayLocInfo({ map, latLng, marker, infowindow })
+    })
 
     $noty = {
         message: new Noty({ type: 'info' }),
@@ -38,18 +43,11 @@ export function init(map) {
     handleHashChange()
 }
 
-function infoTemplate(latLng) {
-    return `
-        <div>
-            <dl class="cf">
-                <dt>Lat</dt>
-                <dd>${latLng.lat()}</dd>
-                <dt>Lng</dt>
-                <dd>${latLng.lng()}</dd>
-            </dl>
-            <button class="js-addToRoute">Add to route</button>
-        </div>
-    `
+function displayLocInfo({ map, latLng, marker, infowindow }) {
+    if (!marker.getMap()) marker.setMap(map)
+    marker.setPosition(latLng)
+    infowindow.setContent(infoTemplate(latLng.lat(), latLng.lng()))
+    infowindow.open(map, marker)
 }
 
 async function handleHashChange() {
@@ -68,7 +66,7 @@ async function handleHashChange() {
     }
 }
 
-export function drawRouteOnMap({ origin, dest, wayPts }) {
+function drawRouteOnMap({ origin, dest, wayPts }) {
     directionsService.route(
         {
             origin: origin,
@@ -81,7 +79,7 @@ export function drawRouteOnMap({ origin, dest, wayPts }) {
     )
 }
 
-export function displayOnMap(response, status) {
+function displayOnMap(response, status) {
     if (status === 'OK') {
         directionsDisplay.setDirections(response)
     }

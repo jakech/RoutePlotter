@@ -28,6 +28,10 @@ html, body {
     display: block;
 }
 
+.route-plotter_form textarea {
+    resize: vertical;
+}
+
 /*btns*/
 .btn {
     padding: 0.5em;
