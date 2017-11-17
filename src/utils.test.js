@@ -57,6 +57,20 @@ describe('processInput', () => {
         )
     })
 
+    fit('remove whitespaces', () => {
+        const inputWhiteSpace = `
+        
+            37.89132957,-122.2798893
+
+            37.87041074,-122.2658093
+        `
+        expect(processInput(inputWhiteSpace)).toEqual(
+            expect.objectContaining({
+                success: true
+            })
+        )
+    })
+
     it('should return data with good input', () => {
         expect(processInput(userInput)).toEqual(
             expect.objectContaining({

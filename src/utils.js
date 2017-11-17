@@ -22,7 +22,7 @@ export function processInput(string) {
     const result = { success: true }
     const data = []
 
-    const lines = string.trim().split('\n')
+    const lines = string.trim().split('\n').filter(l => l) // remove empty lines
 
     if (lines.length < 2) {
         result.success = false
