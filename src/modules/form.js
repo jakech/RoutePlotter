@@ -7,10 +7,9 @@ import formTemplate from '../templates/form.js'
 const BTN_TEXT_LOADING = 'Generating route...'
 const BTN_TEXT_DEFAULT = 'Plot route'
 
-let $form, $input, $btn, $noty
+let $form, $input, $btn
 
 export const init = map => {
-    $noty = new Noty({ type: 'error', timeout: 1000 })
     $form = document.createElement('div')
     $form.innerHTML = formTemplate()
     $input = $form.querySelector('textarea')
@@ -30,19 +29,15 @@ async function handleFormSubmit(e) {
             $btn.innerHTML = BTN_TEXT_LOADING
             try {
                 const res = await generateRoute(data)
-                if (res.data.token) {
-                    window.location.hash = res.data.token
-                } else {
-                    throw new Error('no token')
-                }
+                window.location.hash = res.data.token
             } catch (error) {
-                $noty.setText(error, true).show()
+                new Noty({ text: error.message, type: 'error', timeout: 1000}).show()
             } finally {
                 $btn.innerHTML = BTN_TEXT_DEFAULT
                 $btn.removeAttribute('disabled')
             }
         } else {
-            $noty.setText('input error', true).show()
+            new Noty({ text: 'Invalid input', type: 'error', timeout: 1000}).show()
         }
     }
 }

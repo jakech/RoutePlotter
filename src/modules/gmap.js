@@ -30,13 +30,13 @@ export function init(map) {
     })
 
     map.addListener('click', e => {
-        const { latLng } = e
+        const { latLng  } = e
         displayLocInfo({ map, latLng, marker, infowindow })
     })
 
     $noty = {
-        message: new Noty({ type: 'info' }),
-        error: new Noty({ type: 'error', timeout: 1000 })
+        message: (text) => new Noty({ text, type: 'info' }),
+        error: (text) => new Noty({ text, type: 'error', timeout: 1000 })
     }
 
     window.onhashchange = handleHashChange
@@ -54,13 +54,13 @@ async function handleHashChange() {
     const token = window.location.hash.substr(1)
     if (!token) return
 
-    const n = $noty.message.setText('Processing route...', true).show()
+    const n = $noty.message('Processing route...').show()
     try {
         const { path } = await fetchRoute(token)
         drawRouteOnMap(parseWayPts(path))
     } catch (error) {
         window.location.hash = ''
-        $noty.error.setText(error, true).show()
+        $noty.error(error.message).show()
     } finally {
         n.close()
     }

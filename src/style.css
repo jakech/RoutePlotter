@@ -56,6 +56,10 @@ html, body {
     width: 100%;
 }
 
+dl {
+    display: block;
+}
+
 dt {
     float: left;
     clear: left;
