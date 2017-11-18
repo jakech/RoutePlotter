@@ -39,6 +39,12 @@ export function processInput(string) {
             break
         }
 
+        // check for empty items
+        if (latLng[0].trim() === '' || latLng[1].trim() === '') {
+            result.success = false
+            break
+        }
+
         // check both are number
         if (isNaN(+latLng[0]) || isNaN(+latLng[1])) {
             result.success = false

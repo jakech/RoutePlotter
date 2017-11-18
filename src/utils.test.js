@@ -57,9 +57,9 @@ describe('processInput', () => {
         )
     })
 
-    fit('remove whitespaces', () => {
+    it('remove whitespaces', () => {
         const inputWhiteSpace = `
-        
+
             37.89132957,-122.2798893
 
             37.87041074,-122.2658093
@@ -67,6 +67,20 @@ describe('processInput', () => {
         expect(processInput(inputWhiteSpace)).toEqual(
             expect.objectContaining({
                 success: true
+            })
+        )
+    })
+
+    it('empty lat lng', () => {
+        expect.assertions(2)
+        expect(processInput(`,-122.2658093`)).toEqual(
+            expect.objectContaining({
+                success: false
+            })
+        )
+        expect(processInput(`37.89132957,`)).toEqual(
+            expect.objectContaining({
+                success: false
             })
         )
     })
