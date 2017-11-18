@@ -24,7 +24,7 @@ async function handleFormSubmit(e) {
     const value = $input.value.trim()
     if (value) {
         const { success, data } = processInput(value)
-        if (success) {
+        if (success && data.length >= 2) {
             $btn.setAttribute('disabled', true)
             $btn.innerHTML = BTN_TEXT_LOADING
             try {

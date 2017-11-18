@@ -11,7 +11,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.js$/,
+                test: /\.jsx?$/,
                 loader: 'babel-loader',
                 exclude: /node_modules/
             },
@@ -27,10 +27,10 @@ module.exports = {
             '/': {
                 target: 'http://localhost:8080',
                 bypass: function(req, res, proxyOptions) {
-                  if (req.headers.accept.indexOf("html") !== -1) {
-                    console.log("Skipping proxy for browser request.");
-                    return "/index.html";
-                  }
+                    if (req.headers.accept.indexOf('html') !== -1) {
+                        console.log('Skipping proxy for browser request.')
+                        return '/index.html'
+                    }
                 }
             }
         }

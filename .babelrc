@@ -1,3 +1,4 @@
 {
-    "presets": ["env", "jest"]
+    "presets": ["env", "react", "jest"],
+    "plugins": ["transform-class-properties"]
 }

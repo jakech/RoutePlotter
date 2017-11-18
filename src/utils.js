@@ -24,17 +24,17 @@ export function processInput(string) {
 
     const lines = string.trim().split('\n').filter(l => l) // remove empty lines
 
-    if (lines.length < 2) {
-        result.success = false
-        return result
-    }
+    // if (lines.length < 2) {
+    //     result.success = false
+    //     return result
+    // }
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i]
         var latLng = line.replace(/\s/g, '').split(',')
 
         // check it is a tuple
-        if (latLng.length < 2) {
+        if (latLng.length !== 2) {
             result.success = false
             break
         }
