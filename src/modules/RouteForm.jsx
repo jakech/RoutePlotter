@@ -38,8 +38,12 @@ export default class RouteForm extends Component {
         this.setState({ error: !success })
     }
 
-    handleItemClick = e => {
-        console.log(e)
+    handleItemClick = location => {
+        const { locations } = this.state
+        const newLocations = locations.filter(l => {
+            return location !== l
+        })
+        this.setState({ locations: newLocations })
     }
 
     handleSubmit = async e => {
@@ -75,7 +79,7 @@ export default class RouteForm extends Component {
                             key={i}
                             lat={l[0]}
                             lng={l[1]}
-                            onClick={this.handleItemClick}
+                            onDelete={this.handleItemClick.bind(this, l)}
                         />
                     ))}
                 </ul>
