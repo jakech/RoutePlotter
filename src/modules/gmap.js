@@ -1,11 +1,12 @@
 import Noty from 'noty'
+import humanFormat from 'human-format'
 // import { addToRoute } from './form.js'
 import { fetchRoute } from '../api.js'
 import { parseWayPts } from '../utils.js'
 
 import infoTemplate from '../templates/infoWindow.js'
 
-var directionsService, directionsDisplay, $noty, addToRoute
+var directionsService, directionsDisplay, addToRoute, $info
 
 export function init(map) {
     directionsService = new google.maps.DirectionsService()
@@ -32,21 +33,15 @@ export function init(map) {
     })
 
     map.addListener('click', e => {
-        const { latLng  } = e
+        const { latLng } = e
         displayLocInfo({ map, latLng, marker, infowindow })
     })
-
-    $noty = {
-        message: (text) => new Noty({ text, type: 'info' }),
-        error: (text) => new Noty({ text, type: 'error', timeout: 1000 })
-    }
 
     window.onhashchange = handleHashChange
     handleHashChange()
 }
 
 export function onAddRoute(fn) {
-    console.log('on', fn)
     addToRoute = fn
 }
 
@@ -58,16 +53,35 @@ function displayLocInfo({ map, latLng, marker, infowindow }) {
 }
 
 async function handleHashChange() {
+    if ($info) $info.close()
     const token = window.location.hash.substr(1)
-    if (!token) return
+    if (!token) {
+        directionsDisplay.setDirections({ routes: [] })
+        return
+    }
 
-    const n = $noty.message('Processing route...').show()
+    const n = new Noty({ text: 'Processing route...', type: 'info' }).show()
     try {
-        const { path } = await fetchRoute(token)
+        const { path, total_distance, total_time } = await fetchRoute(token)
+        const distFormatted = humanFormat(total_distance, {
+            unit: 'm',
+            prefix: 'k'
+        })
+        const timeFormatted = humanFormat(total_time, {
+            scale: new humanFormat.Scale({
+                seconds: 1,
+                minutes: 60,
+                hours: 3600
+            })
+        })
         drawRouteOnMap(parseWayPts(path))
+        $info = new Noty({
+            type: 'alert',
+            text: `Distance: ${distFormatted} Time: ${timeFormatted}`
+        }).show()
     } catch (error) {
         window.location.hash = ''
-        $noty.error(error.message).show()
+        new Noty({ text: error.message, type: 'error', timeout: 1000 }).show()
     } finally {
         n.close()
     }
