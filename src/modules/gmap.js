@@ -1,11 +1,11 @@
 import Noty from 'noty'
-import { addToRoute } from './form.js'
+// import { addToRoute } from './form.js'
 import { fetchRoute } from '../api.js'
 import { parseWayPts } from '../utils.js'
 
 import infoTemplate from '../templates/infoWindow.js'
 
-var directionsService, directionsDisplay, $noty
+var directionsService, directionsDisplay, $noty, addToRoute
 
 export function init(map) {
     directionsService = new google.maps.DirectionsService()
@@ -24,7 +24,9 @@ export function init(map) {
         if (event.target.classList.contains('js-addToRoute')) {
             event.preventDefault()
             const coords = marker.getPosition()
-            addToRoute({ lat: coords.lat(), lng: coords.lng() })
+            if (typeof addToRoute === 'function') {
+                addToRoute({ lat: coords.lat(), lng: coords.lng() })
+            }
             marker.setMap(null)
         }
     })
@@ -41,6 +43,11 @@ export function init(map) {
 
     window.onhashchange = handleHashChange
     handleHashChange()
+}
+
+export function onAddRoute(fn) {
+    console.log('on', fn)
+    addToRoute = fn
 }
 
 function displayLocInfo({ map, latLng, marker, infowindow }) {

@@ -4,6 +4,7 @@ import RouteItem from './RouteItem.jsx'
 
 import { processInput } from '../utils.js'
 import { generateRoute } from '../api.js'
+import * as gmap from './gmap.js'
 
 const ENTER_KEY = 13
 
@@ -17,16 +18,24 @@ export default class RouteForm extends Component {
         }
     }
 
+    componentDidMount() {
+        gmap.onAddRoute(({ lat, lng }) => {
+            this.addToRoute([lat, lng])
+        })
+    }
+
+    addToRoute(location) {
+        const { locations } = this.state
+        this.setState({ locations: [...locations, location] })
+    }
+
     handleNewLocation = e => {
         if (e.keyCode !== ENTER_KEY) return
         e.preventDefault()
         const { success, data } = processInput(e.target.value)
 
         if (success) {
-            const { locations } = this.state
-            this.setState({
-                locations: [...locations, ...data]
-            })
+            this.addToRoute(data[0])
             e.target.value = ''
         } else {
             new Noty({
@@ -38,7 +47,7 @@ export default class RouteForm extends Component {
         this.setState({ error: !success })
     }
 
-    handleItemClick = location => {
+    handleDelete = location => {
         const { locations } = this.state
         const newLocations = locations.filter(l => {
             return location !== l
@@ -79,7 +88,7 @@ export default class RouteForm extends Component {
                             key={i}
                             lat={l[0]}
                             lng={l[1]}
-                            onDelete={this.handleItemClick.bind(this, l)}
+                            onDelete={this.handleDelete.bind(this, l)}
                         />
                     ))}
                 </ul>
