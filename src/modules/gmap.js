@@ -1,12 +1,12 @@
 import Noty from 'noty'
 import humanFormat from 'human-format'
-// import { addToRoute } from './form.js'
+import { addToRoute } from './form.js'
 import { fetchRoute } from '../api.js'
 import { parseWayPts } from '../utils.js'
 
 import infoTemplate from '../templates/infoWindow.js'
 
-var directionsService, directionsDisplay, addToRoute, $info
+var directionsService, directionsDisplay, $info
 
 export function init(map) {
     directionsService = new google.maps.DirectionsService()
@@ -39,10 +39,6 @@ export function init(map) {
 
     window.onhashchange = handleHashChange
     handleHashChange()
-}
-
-export function onAddRoute(fn) {
-    addToRoute = fn
 }
 
 function displayLocInfo({ map, latLng, marker, infowindow }) {
