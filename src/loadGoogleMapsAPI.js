@@ -1,4 +1,3 @@
-import { GOOGLE_MAPS_API_URL, GOOGLE_MAPS_API_KEY } from '../config.js'
 const CALLBACK_NAME = '__gmap_callback'
 const TIMEOUT = 5000
 
