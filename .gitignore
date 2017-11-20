@@ -3,5 +3,6 @@ thumbs.db
 *.log
 /node_modules
 
-config.js
-/dist/*
+/dist/*.js
+/dist/*.js.map
+/dist/*.js.LICENSE
