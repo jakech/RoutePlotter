@@ -8,8 +8,8 @@ import * as gmap from './modules/gmap.js'
 
 loadGmap().then(() => {
     const map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: -34.397, lng: 150.644 },
-        zoom: 14,
+        center: { lat: 22.3964, lng: 114.1095 },
+        zoom: 11,
         mapTypeControl: false,
         clickableIcons: false
     })
