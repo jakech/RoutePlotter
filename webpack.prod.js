@@ -12,7 +12,8 @@ module.exports = merge(common, {
             ),
             GOOGLE_MAPS_API_KEY: JSON.stringify(
                 'AIzaSyDkxxOcQmYJY3M4xDy-OuVUZ7p5PXDWpMY'
-            )
+            ),
+            SERVICE_URL: JSON.stringify('http://localhost:8080')
         }),
         new UglifyJsPlugin({
             sourceMap: true

@@ -12,22 +12,12 @@ module.exports = merge(common, {
             ),
             GOOGLE_MAPS_API_KEY: JSON.stringify(
                 'AIzaSyDkxxOcQmYJY3M4xDy-OuVUZ7p5PXDWpMY'
-            )
+            ),
+            SERVICE_URL: JSON.stringify('http://localhost:8080')
         })
     ],
     devServer: {
         contentBase: path.join(__dirname, './dist'),
-        port: 3000,
-        proxy: {
-            '/': {
-                target: 'http://localhost:8080',
-                bypass: function(req, res, proxyOptions) {
-                    if (req.headers.accept.indexOf('html') !== -1) {
-                        console.log('Skipping proxy for browser request.')
-                        return '/index.html'
-                    }
-                }
-            }
-        }
+        port: 3000
     }
 })

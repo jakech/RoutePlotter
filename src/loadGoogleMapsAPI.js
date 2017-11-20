@@ -1,6 +1,7 @@
 const CALLBACK_NAME = '__gmap_callback'
 const TIMEOUT = 5000
 
+/* global GOOGLE_MAPS_API_URL, GOOGLE_MAPS_API_KEY */
 module.exports = () =>
     new Promise((resolve, reject) => {
         const timeout = setTimeout(() => {
