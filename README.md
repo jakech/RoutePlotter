@@ -29,6 +29,6 @@ Requires that you have a mockAPI running, see [Config](#config).
 
 ### Build
 `yarn build` or `npm build`
-The build files will be generated into `/dist/` directory, and be ready to be serve from an static web server.
+The build files will be generated into `/dist/` directory, and ready to be served from an static web server.
 
 Optionally, you can run `node server/index.js` to serve the app by a simple express server.
