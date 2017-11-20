@@ -32,3 +32,14 @@ Requires that you have a mockAPI running, see [Config](#config).
 The build files will be generated into `/dist/` directory, and ready to be served from an static web server.
 
 Optionally, you can run `node server/index.js` to serve the app by a simple express server.
+
+### Usage
+Use the form on the top left to enter locations in the form of `<lat>,<lng>` seperated by newlines.
+Example:
+```
+37.86893429,-122.2678041
+37.89132957,-122.2798893
+37.87041074,-122.2658093
+37.87830521,-122.2691698
+```
+or click the map to pick a location then click `Add to route` to add locations to the form
