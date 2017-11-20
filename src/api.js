@@ -9,9 +9,7 @@ const service = axios.create({
 
 export const generateRoute = data => {
     // data is an array of arrays
-    return service.post('/route', {
-        data: JSON.stringify(data)
-    })
+    return service.post('/route', JSON.stringify(data))
 }
 
 export const fetchRoute = token => {
