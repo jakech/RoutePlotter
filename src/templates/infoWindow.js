@@ -1,5 +1,6 @@
-export default (lat, lng) => `
+export default ({ lat, lng, address }) => `
     <div>
+        <h5>${address}</h5>
         <dl class="cf">
             <dt>Lat</dt>
             <dd>${lat}</dd>

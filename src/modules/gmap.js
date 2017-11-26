@@ -1,16 +1,18 @@
 import Noty from 'noty'
 import humanFormat from 'human-format'
-import { addToRoute } from './form.js'
+// import { addToRoute } from './form.js'
+import { addLocation, selectLocation, unselectLocation } from '../actions'
 import { fetchRoute } from '../api.js'
-import { parseWayPts } from '../utils.js'
+import { parseWayPts, watchStore } from '../utils.js'
 
 import infoTemplate from '../templates/infoWindow.js'
 
 var directionsService, directionsDisplay, $info
 
-export function init(map) {
+export function init(map, store) {
     directionsService = new google.maps.DirectionsService()
     directionsDisplay = new google.maps.DirectionsRenderer()
+    const geocode = promisify(new google.maps.Geocoder().geocode)
     directionsDisplay.setMap(map)
 
     const marker = new google.maps.Marker()
@@ -18,34 +20,41 @@ export function init(map) {
 
     infowindow.addListener('closeclick', () => {
         // remove the marker when inforwindow close
-        marker.setMap(null)
+        store.dispatch(unselectLocation())
     })
 
     window.addEventListener('click', event => {
         if (event.target.classList.contains('js-addToRoute')) {
             event.preventDefault()
-            const coords = marker.getPosition()
-            if (typeof addToRoute === 'function') {
-                addToRoute({ lat: coords.lat(), lng: coords.lng() })
-            }
-            marker.setMap(null)
+            const { currentLocation } = store.getState()
+            store.dispatch(addLocation(currentLocation))
+            store.dispatch(unselectLocation())
         }
     })
 
-    map.addListener('click', e => {
+    map.addListener('click', async e => {
         const { latLng } = e
-        displayLocInfo({ map, latLng, marker, infowindow })
+        store.dispatch(
+            selectLocation({ lat: latLng.lat(), lng: latLng.lng() }, geocode)
+        )
     })
 
     window.onhashchange = handleHashChange
     handleHashChange()
-}
 
-function displayLocInfo({ map, latLng, marker, infowindow }) {
-    if (!marker.getMap()) marker.setMap(map)
-    marker.setPosition(latLng)
-    infowindow.setContent(infoTemplate(latLng.lat(), latLng.lng()))
-    infowindow.open(map, marker)
+    watchStore(store, state => state.currentLocation, displayLocInfo)
+
+    function displayLocInfo(currentLocation) {
+        if (currentLocation) {
+            const { lat, lng } = currentLocation
+            if (!marker.getMap()) marker.setMap(map)
+            marker.setPosition({ lat, lng })
+            infowindow.setContent(infoTemplate(currentLocation))
+            infowindow.open(map, marker)
+        } else {
+            marker.setMap(null)
+        }
+    }
 }
 
 async function handleHashChange() {
@@ -81,6 +90,15 @@ async function handleHashChange() {
     } finally {
         n.close()
     }
+}
+
+function promisify(func) {
+    return (...args) =>
+        new Promise(resolve => {
+            func.call(null, ...args, (...response) => {
+                resolve(response)
+            })
+        })
 }
 
 function drawRouteOnMap({ origin, dest, wayPts }) {

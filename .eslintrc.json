@@ -6,27 +6,16 @@
         "node": true,
         "jest": true
     },
+    "plugins": ["prettier"],
     "extends": "eslint:recommended",
     "parserOptions": {
         "sourceType": "module",
         "ecmaVersion": 2017
     },
     "rules": {
-        "indent": [
+        "prettier/prettier": [
             "error",
-            4
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "semi": [
-            "error",
-            "never"
+            { "singleQuote": true, "tabWidth": 4, "semi": false }
         ]
     },
     "globals": {

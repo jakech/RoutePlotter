@@ -4,7 +4,7 @@ const common = require('./webpack.common.js')
 const path = require('path')
 
 module.exports = merge(common, {
-    devtool: 'inline-source-map',
+    devtool: 'eval-source-map',
     plugins: [
         new webpack.DefinePlugin({
             GOOGLE_MAPS_API_URL: JSON.stringify(

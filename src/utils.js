@@ -22,7 +22,10 @@ export function processInput(string) {
     const result = { success: true }
     const data = []
 
-    const lines = string.trim().split('\n').filter(l => l) // remove empty lines
+    const lines = string
+        .trim()
+        .split('\n')
+        .filter(l => l) // remove empty lines
 
     // if (lines.length < 2) {
     //     result.success = false
@@ -88,4 +91,15 @@ export const makeRetryFunc = ({
         })
     }
     return makeCall()
+}
+
+export function watchStore(store, selector, onChange) {
+    let prevState
+    return store.subscribe(() => {
+        const state = selector(store.getState())
+        if (state !== prevState) {
+            prevState = state
+            onChange(state)
+        }
+    })
 }
