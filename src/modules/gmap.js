@@ -3,7 +3,7 @@ import humanFormat from 'human-format'
 // import { addToRoute } from './form.js'
 import { addLocation, selectLocation, unselectLocation } from '../actions'
 import { fetchRoute } from '../api.js'
-import { parseWayPts, watchStore } from '../utils.js'
+import { parseWayPts, watchStore, promisify } from '../utils.js'
 
 import infoTemplate from '../templates/infoWindow.js'
 
@@ -14,14 +14,6 @@ export function init(map, store) {
     directionsDisplay = new google.maps.DirectionsRenderer()
     const geocode = promisify(new google.maps.Geocoder().geocode)
     directionsDisplay.setMap(map)
-
-    const marker = new google.maps.Marker()
-    const infowindow = new google.maps.InfoWindow()
-
-    infowindow.addListener('closeclick', () => {
-        // remove the marker when inforwindow close
-        store.dispatch(unselectLocation())
-    })
 
     window.addEventListener('click', event => {
         if (event.target.classList.contains('js-addToRoute')) {
@@ -42,9 +34,24 @@ export function init(map, store) {
     window.onhashchange = handleHashChange
     handleHashChange()
 
-    watchStore(store, state => state.currentLocation, displayLocInfo)
+    watchStore(
+        store,
+        state => state.currentLocation,
+        displayLocInfo(map, store)
+    )
+    watchStore(store, state => state.locations, renderMarkers(map))
+}
 
-    function displayLocInfo(currentLocation) {
+function displayLocInfo(map, store) {
+    const marker = new google.maps.Marker()
+    const infowindow = new google.maps.InfoWindow()
+
+    infowindow.addListener('closeclick', () => {
+        // remove the marker when inforwindow close
+        store.dispatch(unselectLocation())
+    })
+
+    return currentLocation => {
         if (currentLocation) {
             const { lat, lng } = currentLocation
             if (!marker.getMap()) marker.setMap(map)
@@ -54,6 +61,20 @@ export function init(map, store) {
         } else {
             marker.setMap(null)
         }
+    }
+}
+
+function renderMarkers(map) {
+    let markers = []
+    return locations => {
+        for (let i = 0; i < markers.length; i++) {
+            markers[i].setMap(null)
+        }
+        markers = []
+        markers = locations.map(
+            ({ lat, lng }) =>
+                new google.maps.Marker({ position: { lat, lng }, map: map })
+        )
     }
 }
 
@@ -90,15 +111,6 @@ async function handleHashChange() {
     } finally {
         n.close()
     }
-}
-
-function promisify(func) {
-    return (...args) =>
-        new Promise(resolve => {
-            func.call(null, ...args, (...response) => {
-                resolve(response)
-            })
-        })
 }
 
 function drawRouteOnMap({ origin, dest, wayPts }) {

@@ -103,3 +103,12 @@ export function watchStore(store, selector, onChange) {
         }
     })
 }
+
+export function promisify(func) {
+    return (...args) =>
+        new Promise(resolve => {
+            func.call(null, ...args, (...response) => {
+                resolve(response)
+            })
+        })
+}
