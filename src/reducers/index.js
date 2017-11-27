@@ -14,6 +14,8 @@ const locations = (state = [], action) => {
             ]
         case 'REMOVE_LOCATION':
             return state.filter(loc => loc.id !== action.id)
+        case 'CLEAR_ALL_LOCATION':
+            return []
         default:
             return state
     }

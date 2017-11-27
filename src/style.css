@@ -22,10 +22,7 @@ html, body {
     width: 24rem;
     margin: 2rem;
     font-size: 1rem;
-    display: none;
-}
-.route-plotter_map .route-plotter_form {
-    display: block;
+    background: ghostwhite;
 }
 
 .route-plotter_form textarea {
@@ -38,11 +35,18 @@ html, body {
     margin: 0;
 }
 
-.form-routes_list_item {
+.form-routes_list_item,
+.form-routes_list_empty{
     padding: 1em;
     margin: 0;
     background: ghostwhite;
+}
+.form-routes_list_empty {
+    color: gray;
+}
+.form-routes_list_item {
     border-top: 1px solid gainsboro;
+    cursor: pointer;
 }
 .form-routes_list_item:first-of-type {
     border-top: none;

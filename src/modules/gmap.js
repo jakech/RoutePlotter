@@ -31,8 +31,7 @@ export function init(map, store) {
         )
     })
 
-    window.onhashchange = handleHashChange
-    handleHashChange()
+    window.onhashchange = handleHashChange(store)
 
     watchStore(
         store,
@@ -78,38 +77,45 @@ function renderMarkers(map) {
     }
 }
 
-async function handleHashChange() {
-    if ($info) $info.close()
-    const token = window.location.hash.substr(1)
-    if (!token) {
-        directionsDisplay.setDirections({ routes: [] })
-        return
-    }
+function handleHashChange(store) {
+    return async () => {
+        if ($info) $info.close()
+        const token = window.location.hash.substr(1)
+        if (!token) {
+            directionsDisplay.setDirections({ routes: [] })
+            return
+        }
 
-    const n = new Noty({ text: 'Processing route...', type: 'info' }).show()
-    try {
-        const { path, total_distance, total_time } = await fetchRoute(token)
-        const distFormatted = humanFormat(total_distance, {
-            unit: 'm',
-            prefix: 'k'
-        })
-        const timeFormatted = humanFormat(total_time, {
-            scale: new humanFormat.Scale({
-                seconds: 1,
-                minutes: 60,
-                hours: 3600
+        const n = new Noty({ text: 'Processing route...', type: 'info' }).show()
+        try {
+            const { path, total_distance, total_time } = await fetchRoute(token)
+            const distFormatted = humanFormat(total_distance, {
+                unit: 'm',
+                prefix: 'k'
             })
-        })
-        drawRouteOnMap(parseWayPts(path))
-        $info = new Noty({
-            type: 'alert',
-            text: `Distance: ${distFormatted} Time: ${timeFormatted}`
-        }).show()
-    } catch (error) {
-        window.location.hash = ''
-        new Noty({ text: error.message, type: 'error', timeout: 1000 }).show()
-    } finally {
-        n.close()
+            const timeFormatted = humanFormat(total_time, {
+                scale: new humanFormat.Scale({
+                    seconds: 1,
+                    minutes: 60,
+                    hours: 3600
+                })
+            })
+            store.dispatch({ type: 'CLEAR_ALL_LOCATION' })
+            drawRouteOnMap(parseWayPts(path))
+            $info = new Noty({
+                type: 'alert',
+                text: `Distance: ${distFormatted} Time: ${timeFormatted}`
+            }).show()
+        } catch (error) {
+            window.location.hash = ''
+            new Noty({
+                text: error.message,
+                type: 'error',
+                timeout: 1000
+            }).show()
+        } finally {
+            n.close()
+        }
     }
 }
 
