@@ -31,3 +31,8 @@ export const selectLocation = ({ lat, lng }, geocode) => async dispatch => {
 export const unselectLocation = () => ({
     type: 'UNSELECT_LOCATION'
 })
+
+export const removeLocation = (id) => ({
+    type: 'REMOVE_LOCATION',
+    id
+})

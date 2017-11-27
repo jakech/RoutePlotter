@@ -1,8 +1,17 @@
-export default () => `
+export default locations => `
     <div id="form" class="route-plotter_form form-routes">
-        <form>
-            <textarea class="db" rows="10" placeholder="Input in the format [lat],[lng] seperated by new line."></textarea>
-            <button class="btn db" type="submit">Plot route</button>
-        </form>
+        <ul class="form-routes_list">
+            ${locations
+                .map(
+                    ({ id, address }) => `
+                        <li
+                            class="form-routes_list_item"
+                            data-id="${id}"
+                        >${address}</li>
+                    `
+                )
+                .join('\n')}
+        </ul>
+        <button class="btn db" type="submit">Plot route</button>
     </div>
 `

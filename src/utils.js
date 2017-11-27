@@ -95,13 +95,16 @@ export const makeRetryFunc = ({
 
 export function watchStore(store, selector, onChange) {
     let prevState
-    return store.subscribe(() => {
+    const handleChange = () => {
         const state = selector(store.getState())
         if (state !== prevState) {
             prevState = state
             onChange(state)
         }
-    })
+    }
+    let unsub = store.subscribe(handleChange)
+    handleChange()
+    return unsub
 }
 
 export function promisify(func) {

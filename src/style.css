@@ -32,6 +32,21 @@ html, body {
     resize: vertical;
 }
 
+.form-routes_list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.form-routes_list_item {
+    padding: 1em;
+    margin: 0;
+    background: ghostwhite;
+    border-top: 1px solid gainsboro;
+}
+.form-routes_list_item:first-of-type {
+    border-top: none;
+}
 /*btns*/
 .btn {
     padding: 0.5em;
