@@ -23,8 +23,9 @@ export function init(map, store) {
             store.dispatch(removeLocation(+event.target.dataset.id))
         } else if (classList.contains('form-routes_list_btn')) {
             event.preventDefault()
-            handleFormSubmit(selector(store.getState()))
-            // store.dispatch(submitRoute(selector(store.getState())))
+            // handleFormSubmit(selector(store.getState()))
+            const { locations } = store.getState()
+            store.dispatch(submitRoute(locations))
         }
     })
 
@@ -33,8 +34,8 @@ export function init(map, store) {
     return $form
 }
 
-function selector(state) {
-    return state.locations
+function selector({ locations, ui }) {
+    return { locations, ui }
 }
 
 function render(state) {
@@ -42,31 +43,31 @@ function render(state) {
     $btn = $form.querySelector('button')
 }
 
-async function handleFormSubmit(locations) {
-    const data = locations.map(loc => {
-        return [loc.lat, loc.lng]
-    })
-    if (data.length >= 2) {
-        $btn.setAttribute('disabled', true)
-        $btn.innerHTML = BTN_TEXT_LOADING
-        try {
-            const res = await generateRoute(data)
-            window.location.hash = res.data.token
-        } catch (error) {
-            new Noty({
-                text: error.message,
-                type: 'error',
-                timeout: 1000
-            }).show()
-        } finally {
-            $btn.innerHTML = BTN_TEXT_DEFAULT
-            $btn.removeAttribute('disabled')
-        }
-    } else {
-        new Noty({
-            text: 'Invalid input',
-            type: 'error',
-            timeout: 1000
-        }).show()
-    }
-}
+// async function handleFormSubmit(locations) {
+//     const data = locations.map(loc => {
+//         return [loc.lat, loc.lng]
+//     })
+//     if (data.length >= 2) {
+//         $btn.setAttribute('disabled', true)
+//         $btn.innerHTML = BTN_TEXT_LOADING
+//         try {
+//             const res = await generateRoute(data)
+//             window.location.hash = res.data.token
+//         } catch (error) {
+//             new Noty({
+//                 text: error.message,
+//                 type: 'error',
+//                 timeout: 1000
+//             }).show()
+//         } finally {
+//             $btn.innerHTML = BTN_TEXT_DEFAULT
+//             $btn.removeAttribute('disabled')
+//         }
+//     } else {
+//         new Noty({
+//             text: 'Invalid input',
+//             type: 'error',
+//             timeout: 1000
+//         }).show()
+//     }
+// }

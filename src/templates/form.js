@@ -1,4 +1,7 @@
-export default locations => `
+const BTN_TEXT_LOADING = 'Generating route...'
+const BTN_TEXT_DEFAULT = 'Plot route'
+
+export default ({ locations, ui }) => `
     <div id="form" class="route-plotter_form form-routes">
         <ul class="form-routes_list">
             ${
@@ -7,15 +10,17 @@ export default locations => `
                           .map(
                               ({ id, address }) => `
                         <li
-                            class="form - routes_list_item"
+                            class="form-routes_list_item"
                             data-id="${id}"
                         >${address}</li>
                     `
                           )
                           .join('\n')
-                    : `<li class="form-routes_list_empty">Select locations from the map</li>`
+                    : `<li class="form-routes_list_empty">Select 2 or more locations from the map</li>`
             }
         </ul>
-        <button class="btn db form-routes_list_btn" type="button">Plot route</button>
+        <button class="btn db form-routes_list_btn" type="button" ${
+            locations.length >= 2 && !ui.formSubmitting ? `` : `disabled`
+        }>${ui.formSubmitting ? BTN_TEXT_LOADING : BTN_TEXT_DEFAULT}</button>
     </div>
 `

@@ -10,7 +10,6 @@ export const addLocation = ({ lat, lng, address }) => ({
 })
 
 export const selectLocation = ({ lat, lng, address }, geocode) => {
-    console.log(address)
     if (address !== undefined) {
         return {
             type: 'SELECT_LOCATION',
@@ -63,17 +62,20 @@ export const submitRoute = locations => async dispatch => {
     dispatch({
         type: 'ROUTE_SUBMIT_REQUEST'
     })
+    const data = locations.map(loc => {
+        return [loc.lat, loc.lng]
+    })
     try {
-        const res = await api.generateRoute(locations)
+        const res = await api.generateRoute(data)
         dispatch({
             type: 'ROUTE_SUBMIT_SUCCESS',
             token: res.data.token
         })
+        window.location.hash = res.data.token
     } catch (error) {
         dispatch({
             type: 'ROUTE_SUBMIT_FAILURE',
-            text: error.message,
-            messageType: 'error'
+            text: error.message
         })
     }
 }

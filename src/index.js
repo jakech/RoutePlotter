@@ -11,6 +11,9 @@ import logger from 'redux-logger'
 import thunk from 'redux-thunk'
 import reducers from './reducers'
 
+import { watchStore } from './utils.js'
+import Noty from 'noty'
+
 loadGmap().then(() => {
     const map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: 22.3964, lng: 114.1095 },
@@ -26,6 +29,19 @@ loadGmap().then(() => {
     }
 
     const store = createStore(reducers, applyMiddleware(...middlewares))
+
+    window.onhashchange = () => {
+        const hash = window.location.hash.substr(1)
+        store.dispatch({ type: 'HASH_CHANGE', hash })
+    }
+
+    watchStore(
+        store,
+        state => state.message,
+        message => {
+            if (message.text !== '') new Noty(message).show()
+        }
+    )
 
     gmap.init(map, store)
     form.init(map, store)

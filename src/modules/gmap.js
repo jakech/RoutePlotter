@@ -31,7 +31,8 @@ export function init(map, store) {
         )
     })
 
-    window.onhashchange = handleHashChange(store)
+    // window.onhashchange = handleHashChange(store)
+    
 
     watchStore(
         store,
@@ -100,7 +101,7 @@ function handleHashChange(store) {
                     hours: 3600
                 })
             })
-            store.dispatch({ type: 'CLEAR_ALL_LOCATION' })
+            store.dispatch({ type: 'CLEAR_ALL_LOCATIONS' })
             drawRouteOnMap(parseWayPts(path))
             $info = new Noty({
                 type: 'alert',
