@@ -1,6 +1,5 @@
 import Noty from 'noty'
 import humanFormat from 'human-format'
-// import { addToRoute } from './form.js'
 import { addLocation, selectLocation, unselectLocation } from '../actions'
 import { fetchRoute } from '../api.js'
 import { parseWayPts, watchStore, promisify } from '../utils.js'
@@ -12,7 +11,6 @@ var directionsService, directionsDisplay, $info
 export function init(map, store) {
     directionsService = new google.maps.DirectionsService()
     directionsDisplay = new google.maps.DirectionsRenderer()
-    const geocode = promisify(new google.maps.Geocoder().geocode)
     directionsDisplay.setMap(map)
 
     window.addEventListener('click', event => {
@@ -24,15 +22,7 @@ export function init(map, store) {
         }
     })
 
-    map.addListener('click', async e => {
-        const { latLng } = e
-        store.dispatch(
-            selectLocation({ lat: latLng.lat(), lng: latLng.lng() }, geocode)
-        )
-    })
-
-    // window.onhashchange = handleHashChange(store)
-    
+    watchStore(store, state => state.ui.routeHash, handleHashChange(store, map))
 
     watchStore(
         store,
@@ -78,11 +68,24 @@ function renderMarkers(map) {
     }
 }
 
-function handleHashChange(store) {
-    return async () => {
+function handleHashChange(store, map) {
+    const geocode = promisify(new google.maps.Geocoder().geocode)
+    let listener
+
+    return async hash => {
         if ($info) $info.close()
-        const token = window.location.hash.substr(1)
-        if (!token) {
+        const token = hash
+        if (token === '') {
+            listener = map.addListener('click', async e => {
+                const { latLng } = e
+                store.dispatch(
+                    selectLocation(
+                        { lat: latLng.lat(), lng: latLng.lng() },
+                        geocode
+                    )
+                )
+            })
+
             directionsDisplay.setDirections({ routes: [] })
             return
         }
@@ -101,8 +104,9 @@ function handleHashChange(store) {
                     hours: 3600
                 })
             })
-            store.dispatch({ type: 'CLEAR_ALL_LOCATIONS' })
             drawRouteOnMap(parseWayPts(path))
+            listener.remove()
+
             $info = new Noty({
                 type: 'alert',
                 text: `Distance: ${distFormatted} Time: ${timeFormatted}`

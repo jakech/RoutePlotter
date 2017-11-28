@@ -29,11 +29,14 @@ loadGmap().then(() => {
     }
 
     const store = createStore(reducers, applyMiddleware(...middlewares))
+    
 
-    window.onhashchange = () => {
+    const handleHashChange = () => {
         const hash = window.location.hash.substr(1)
         store.dispatch({ type: 'HASH_CHANGE', hash })
     }
+    window.onhashchange = handleHashChange
+    handleHashChange()
 
     watchStore(
         store,
