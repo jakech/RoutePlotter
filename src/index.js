@@ -6,9 +6,8 @@ import 'noty/lib/noty.css'
 import * as form from './modules/form.js'
 import * as gmap from './modules/gmap.js'
 
-import { createStore, applyMiddleware } from 'redux'
-import logger from 'redux-logger'
-import thunk from 'redux-thunk'
+import { createStore } from 'redux'
+import middlewares from './middlewares'
 import reducers from './reducers'
 
 import { watchStore } from './utils.js'
@@ -23,20 +22,7 @@ loadGmap().then(() => {
         clickableIcons: false
     })
 
-    let middlewares = [thunk]
-
-    if (process.env.NODE_ENV === 'development') {
-        middlewares = [...middlewares, logger]
-    }
-
-    const store = createStore(reducers, applyMiddleware(...middlewares))
-
-    const handleHashChange = () => {
-        const hash = window.location.hash.substr(1)
-        store.dispatch({ type: 'HASH_CHANGE', hash })
-    }
-    window.onhashchange = handleHashChange
-    handleHashChange()
+    const store = createStore(reducers, middlewares)
 
     let n
     watchStore(

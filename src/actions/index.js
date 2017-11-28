@@ -71,7 +71,10 @@ export const submitRoute = locations => async dispatch => {
             type: 'ROUTE_SUBMIT_SUCCESS',
             token: res.data.token
         })
-        window.location.hash = res.data.token
+        dispatch({
+            type: 'HASH_CHANGE',
+            hash: res.data.token
+        })
     } catch (error) {
         dispatch({
             type: 'ROUTE_SUBMIT_FAILURE',
@@ -95,7 +98,10 @@ export const fetchRoute = token => async dispatch => {
             type: 'ROUTE_INFO_FAILURE',
             text: error.message
         })
-        window.location.hash = ''
+        dispatch({
+            type: 'HASH_CHANGE',
+            hash: ''
+        })
     }
 }
 
