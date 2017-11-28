@@ -23,7 +23,7 @@ export function init(map, store) {
         }
     })
 
-    watchStore(store, state => state.ui, handleHashChange(store, map))
+    watchStore(store, state => state.ui.routeHash, handleHashChange(store, map))
     watchStore(
         store,
         state => state.routeInfo,
@@ -117,15 +117,14 @@ function handleHashChange(store, map) {
         }
     }
     let listener
-    return async ({ routeHash }) => {
+    return async routeHash => {
         if (routeHash === '') {
             store.dispatch(clearRoute())
             // store.dispatch(clearMessage())
             listener = map.addListener('click', handleMapClick)
-            return
+        } else {
+            listener && listener.remove()
+            store.dispatch(fetchRoute(routeHash))
         }
-
-        store.dispatch(fetchRoute(routeHash))
-        listener.remove()
     }
 }

@@ -30,7 +30,6 @@ const currentLocation = (state = null, action) => {
     switch (action.type) {
         case 'SELECT_LOCATION':
             return {
-                id: action.id,
                 lat: action.lat,
                 lng: action.lng,
                 address: action.address

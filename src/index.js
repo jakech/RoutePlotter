@@ -12,6 +12,7 @@ import thunk from 'redux-thunk'
 import reducers from './reducers'
 
 import { watchStore } from './utils.js'
+import { clearMessage } from './actions'
 import Noty from 'noty'
 
 loadGmap().then(() => {
@@ -29,7 +30,6 @@ loadGmap().then(() => {
     }
 
     const store = createStore(reducers, applyMiddleware(...middlewares))
-    
 
     const handleHashChange = () => {
         const hash = window.location.hash.substr(1)
@@ -37,14 +37,20 @@ loadGmap().then(() => {
     }
     window.onhashchange = handleHashChange
     handleHashChange()
-    
+
     let n
     watchStore(
         store,
         state => state.message,
         message => {
             n && n.close()
-            if (message.text !== '') n = new Noty(message).show()
+            if (message.text !== '') {
+                n = new Noty(message)
+                if (message.timeout !== undefined) {
+                    n.on('afterClose', () => store.dispatch(clearMessage()))
+                }
+                n.show()
+            }
         }
     )
 
