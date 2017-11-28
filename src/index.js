@@ -37,12 +37,14 @@ loadGmap().then(() => {
     }
     window.onhashchange = handleHashChange
     handleHashChange()
-
+    
+    let n
     watchStore(
         store,
         state => state.message,
         message => {
-            if (message.text !== '') new Noty(message).show()
+            n && n.close()
+            if (message.text !== '') n = new Noty(message).show()
         }
     )
 

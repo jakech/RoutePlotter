@@ -79,3 +79,30 @@ export const submitRoute = locations => async dispatch => {
         })
     }
 }
+
+export const fetchRoute = token => async dispatch => {
+    dispatch({
+        type: 'ROUTE_INFO_REQUEST'
+    })
+    try {
+        const payload = await api.fetchRoute(token)
+        dispatch({
+            type: 'ROUTE_INFO_SUCCESS',
+            payload
+        })
+    } catch (error) {
+        dispatch({
+            type: 'ROUTE_INFO_FAILURE',
+            text: error.message
+        })
+        window.location.hash = ''
+    }
+}
+
+export const clearRoute = () => ({
+    type: 'ROUTE_INFO_CLEAR'
+})
+
+export const clearMessage = () => ({
+    type: 'MESSAGE_CLEAR'
+})

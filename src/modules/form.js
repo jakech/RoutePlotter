@@ -1,5 +1,5 @@
 import { watchStore } from '../utils.js'
-import { removeLocation, submitRoute } from '../actions'
+import { removeLocation, submitRoute, unselectLocation } from '../actions'
 import formTemplate from '../templates/form.js'
 
 let $form
@@ -14,6 +14,7 @@ export function init(map, store) {
         } else if (classList.contains('form-routes_list_btn')) {
             event.preventDefault()
             const { locations } = store.getState()
+            store.dispatch(unselectLocation())
             store.dispatch(submitRoute(locations))
         }
     })

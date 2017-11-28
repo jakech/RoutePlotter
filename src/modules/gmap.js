@@ -1,16 +1,17 @@
-import Noty from 'noty'
-import humanFormat from 'human-format'
-import { addLocation, selectLocation, unselectLocation } from '../actions'
-import { fetchRoute } from '../api.js'
 import { parseWayPts, watchStore, promisify } from '../utils.js'
-
 import infoTemplate from '../templates/infoWindow.js'
-
-var directionsService, directionsDisplay, $info
+import {
+    addLocation,
+    selectLocation,
+    unselectLocation,
+    fetchRoute,
+    clearRoute,
+    clearMessage
+} from '../actions'
 
 export function init(map, store) {
-    directionsService = new google.maps.DirectionsService()
-    directionsDisplay = new google.maps.DirectionsRenderer()
+    const directionsService = new google.maps.DirectionsService()
+    const directionsDisplay = new google.maps.DirectionsRenderer()
     directionsDisplay.setMap(map)
 
     window.addEventListener('click', event => {
@@ -22,8 +23,12 @@ export function init(map, store) {
         }
     })
 
-    watchStore(store, state => state.ui.routeHash, handleHashChange(store, map))
-
+    watchStore(store, state => state.ui, handleHashChange(store, map))
+    watchStore(
+        store,
+        state => state.routeInfo,
+        renderRoute(directionsService, directionsDisplay)
+    )
     watchStore(
         store,
         state => state.currentLocation,
@@ -68,77 +73,59 @@ function renderMarkers(map) {
     }
 }
 
-function handleHashChange(store, map) {
-    const geocode = promisify(new google.maps.Geocoder().geocode)
-    let listener
-
-    return async hash => {
-        if ($info) $info.close()
-        const token = hash
-        if (token === '') {
-            listener = map.addListener('click', async e => {
-                const { latLng } = e
-                store.dispatch(
-                    selectLocation(
-                        { lat: latLng.lat(), lng: latLng.lng() },
-                        geocode
-                    )
-                )
-            })
-
+function renderRoute(directionsService, directionsDisplay) {
+    return routeInfo => {
+        if (routeInfo) {
+            drawRouteOnMap(parseWayPts(routeInfo.route))
+        } else {
             directionsDisplay.setDirections({ routes: [] })
-            return
         }
+    }
 
-        const n = new Noty({ text: 'Processing route...', type: 'info' }).show()
-        try {
-            const { path, total_distance, total_time } = await fetchRoute(token)
-            const distFormatted = humanFormat(total_distance, {
-                unit: 'm',
-                prefix: 'k'
-            })
-            const timeFormatted = humanFormat(total_time, {
-                scale: new humanFormat.Scale({
-                    seconds: 1,
-                    minutes: 60,
-                    hours: 3600
-                })
-            })
-            drawRouteOnMap(parseWayPts(path))
-            listener.remove()
+    function drawRouteOnMap({ origin, dest, wayPts }) {
+        directionsService.route(
+            {
+                origin: origin,
+                destination: dest,
+                waypoints: wayPts,
+                optimizeWaypoints: false,
+                travelMode: 'DRIVING'
+            },
+            displayOnMap
+        )
+    }
 
-            $info = new Noty({
-                type: 'alert',
-                text: `Distance: ${distFormatted} Time: ${timeFormatted}`
-            }).show()
-        } catch (error) {
-            window.location.hash = ''
-            new Noty({
-                text: error.message,
-                type: 'error',
-                timeout: 1000
-            }).show()
-        } finally {
-            n.close()
+    function displayOnMap(response, status) {
+        if (status === 'OK') {
+            directionsDisplay.setDirections(response)
         }
     }
 }
 
-function drawRouteOnMap({ origin, dest, wayPts }) {
-    directionsService.route(
-        {
-            origin: origin,
-            destination: dest,
-            waypoints: wayPts,
-            optimizeWaypoints: false,
-            travelMode: 'DRIVING'
-        },
-        displayOnMap
-    )
-}
+function handleHashChange(store, map) {
+    const geocode = promisify(new google.maps.Geocoder().geocode)
+    const handleMapClick = async e => {
+        const { ui } = store.getState()
+        if (!ui.formSubmitting) {
+            const { latLng } = e
+            store.dispatch(
+                selectLocation(
+                    { lat: latLng.lat(), lng: latLng.lng() },
+                    geocode
+                )
+            )
+        }
+    }
+    let listener
+    return async ({ routeHash }) => {
+        if (routeHash === '') {
+            store.dispatch(clearRoute())
+            // store.dispatch(clearMessage())
+            listener = map.addListener('click', handleMapClick)
+            return
+        }
 
-function displayOnMap(response, status) {
-    if (status === 'OK') {
-        directionsDisplay.setDirections(response)
+        store.dispatch(fetchRoute(routeHash))
+        listener.remove()
     }
 }
