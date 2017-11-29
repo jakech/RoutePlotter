@@ -48,9 +48,13 @@ html, body {
     border-top: 1px solid gainsboro;
     cursor: pointer;
 }
+.form-routes_list_item span {
+    max-width: 16em;
+}
 .form-routes_list_item:first-of-type {
     border-top: none;
 }
+
 /*btns*/
 .btn {
     display: inline-block;
@@ -105,4 +109,11 @@ dt:after {
 dd {
     float: left;
     margin: 0 0 0 4em;
+}
+
+.right {
+    float: right;
+}
+.left {
+    float: left;
 }

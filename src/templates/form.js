@@ -1,3 +1,4 @@
+import listItem from './locationListItem.js'
 const BTN_TEXT_LOADING = 'Generating route...'
 const BTN_TEXT_DEFAULT = 'Plot route'
 
@@ -6,16 +7,7 @@ export default ({ locations, ui }) => `
         <ul class="form-routes_list">
             ${
                 locations.length > 0
-                    ? locations
-                          .map(
-                              ({ id, address }) => `
-                        <li
-                            class="form-routes_list_item"
-                            data-id="${id}"
-                        >${address}</li>
-                    `
-                          )
-                          .join('\n')
+                    ? locations.map(listItem).join('\n')
                     : `<li class="form-routes_list_empty">Select 2 or more locations from the map</li>`
             }
         </ul>

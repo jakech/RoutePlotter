@@ -112,3 +112,9 @@ export const clearRoute = () => ({
 export const clearMessage = () => ({
     type: 'MESSAGE_CLEAR'
 })
+
+export const moveLocation = (id, dir) => ({
+    type: 'LOCATION_MOVE',
+    id,
+    dir
+})

@@ -1,5 +1,10 @@
 import { watchStore } from '../utils.js'
-import { removeLocation, submitRoute, unselectLocation } from '../actions'
+import {
+    removeLocation,
+    submitRoute,
+    unselectLocation,
+    moveLocation
+} from '../actions'
 import formTemplate from '../templates/form.js'
 
 let $form
@@ -9,8 +14,15 @@ export function init(map, store) {
 
     $form.addEventListener('click', event => {
         const { classList } = event.target
-        if (classList.contains('form-routes_list_item')) {
-            store.dispatch(removeLocation(+event.target.dataset.id))
+        if (classList.contains('js-form-routes_list_item--delete')) {
+            const id = +event.target.parentElement.parentElement.dataset.id
+            store.dispatch(removeLocation(id))
+        } else if (classList.contains('js-form-routes_list_item--up')) {
+            const id = +event.target.parentElement.parentElement.dataset.id
+            store.dispatch(moveLocation(id, 'up'))
+        } else if (classList.contains('js-form-routes_list_item--down')) {
+            const id = +event.target.parentElement.parentElement.dataset.id
+            store.dispatch(moveLocation(id, 'down'))
         } else if (classList.contains('form-routes_list_btn')) {
             event.preventDefault()
             const { locations } = store.getState()
