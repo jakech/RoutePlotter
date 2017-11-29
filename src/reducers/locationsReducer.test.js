@@ -7,6 +7,12 @@ fdescribe('location reducer', () => {
         lng: 114.12700653076172,
         address: 'Tsing Sha Hwy, Stonecutters Island, Hong Kong'
     }
+    const mockLoc2 = {
+        id: 1,
+        lat: 22.347217992714814,
+        lng: 114.10125732421875,
+        address: '22 Tsing Chin St, Tsing Yi, Hong Kong'
+    }
     it('should return the initial state', () => {
         expect(reducer(undefined, {})).toEqual([])
     })
@@ -24,5 +30,19 @@ fdescribe('location reducer', () => {
                 id: mockLoc.id
             })
         ).toEqual([])
+    })
+
+    it('should handle LOCATION_MOVE', () => {
+        expect.assertions(2)
+        const state = [mockLoc, mockLoc2]
+        const expectedState = [mockLoc2, mockLoc]
+
+        expect(
+            reducer(state, { type: 'LOCATION_MOVE', id: 1, dir: 'up' })
+        ).toEqual(expectedState)
+
+        expect(
+            reducer(state, { type: 'LOCATION_MOVE', id: 0, dir: 'down' })
+        ).toEqual(expectedState)
     })
 })
