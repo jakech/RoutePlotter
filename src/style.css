@@ -46,7 +46,6 @@ html, body {
 }
 .form-routes_list_item {
     border-top: 1px solid gainsboro;
-    cursor: pointer;
 }
 .form-routes_list_item span {
     max-width: 16em;
