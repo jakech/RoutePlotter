@@ -3,7 +3,7 @@ const BTN_TEXT_LOADING = 'Generating route...'
 const BTN_TEXT_DEFAULT = 'Plot route'
 
 export default ({ locations, ui }) => `
-    <div id="form" class="route-plotter_form form-routes">
+    <div id="form" class="route-plotter_form form-routes panel">
         <ul class="form-routes_list">
             ${
                 locations.length > 0

@@ -5,8 +5,7 @@ import {
     selectLocation,
     unselectLocation,
     fetchRoute,
-    clearRoute,
-    clearMessage
+    clearRoute
 } from '../actions'
 
 export function init(map, store) {
@@ -120,10 +119,10 @@ function handleHashChange(store, map) {
     return async routeHash => {
         if (routeHash === '') {
             store.dispatch(clearRoute())
-            // store.dispatch(clearMessage())
             listener = map.addListener('click', handleMapClick)
         } else {
             listener && listener.remove()
+            store.dispatch(unselectLocation())
             store.dispatch(fetchRoute(routeHash))
         }
     }

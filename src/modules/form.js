@@ -6,6 +6,7 @@ import {
     moveLocation
 } from '../actions'
 import formTemplate from '../templates/form.js'
+import routeInfo from '../templates/routeInfo.js'
 
 let $form
 export function init(map, store) {
@@ -36,14 +37,16 @@ export function init(map, store) {
     return $form
 }
 
-function selector({ locations, ui }) {
-    return { locations, ui }
+function selector({ locations, ui, routeInfo }) {
+    return { locations, ui, routeInfo }
 }
 
 function render(state) {
     if (state.ui.routeHash === '') {
         $form.innerHTML = formTemplate(state)
+    } else if (state.routeInfo !== null) {
+        $form.innerHTML = routeInfo(state.routeInfo)
     } else {
-        $form.innerHTML = '<a class="btn btn-restart" href="#">Restart</a>'
+        $form.innerHTML = ''
     }
 }
