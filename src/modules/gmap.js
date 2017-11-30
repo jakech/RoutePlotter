@@ -10,7 +10,9 @@ import {
 
 export function init(map, store) {
     const directionsService = new google.maps.DirectionsService()
-    const directionsDisplay = new google.maps.DirectionsRenderer()
+    const directionsDisplay = new google.maps.DirectionsRenderer({
+        preserveViewport: true
+    })
     directionsDisplay.setMap(map)
 
     window.addEventListener('click', event => {
@@ -97,6 +99,25 @@ function renderRoute(directionsService, directionsDisplay) {
     function displayOnMap(response, status) {
         if (status === 'OK') {
             directionsDisplay.setDirections(response)
+            const map = directionsDisplay.getMap()
+            const b = directionsDisplay.getDirections().routes[0].bounds
+
+            google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
+                const panel = document
+                    .querySelector('.panel')
+                    .getBoundingClientRect()
+                const sw = b.getSouthWest()
+                const worldCoords = map.getProjection().fromLatLngToPoint(sw)
+                const scale = Math.pow(2, map.getZoom())
+                const p = new google.maps.Point(
+                    (worldCoords.x * scale - (panel.x + panel.width)) / scale,
+                    worldCoords.y
+                )
+                map.fitBounds(
+                    b.extend(map.getProjection().fromPointToLatLng(p))
+                )
+            })
+            map.fitBounds(b)
         }
     }
 }
