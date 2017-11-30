@@ -104,7 +104,7 @@ function renderRoute(directionsService, directionsDisplay) {
 
             google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
                 const panel = document
-                    .querySelector('.panel')
+                    .querySelector('.js-route-info')
                     .getBoundingClientRect()
                 const sw = b.getSouthWest()
                 const worldCoords = map.getProjection().fromLatLngToPoint(sw)

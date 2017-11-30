@@ -10,7 +10,7 @@ const formatDistance = meters => humanFormat(meters, { unit: 'm', prefix: 'k' })
 const formatTime = seconds => humanFormat(seconds, { scale: timeScale })
 
 export default ({ distance, time }) => `
-    <div class="panel cf">
+    <div class="js-route-info panel cf">
         <dl class="ma cf">
             <dt>Distance</dt>
             <dd>${formatDistance(distance)}</dd>
